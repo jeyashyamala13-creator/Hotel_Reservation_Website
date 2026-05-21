@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ hotel.name }} - StayEase{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    
+    <a href="{% url 'hotel_list' %}" class="text-primary font-medium hover:underline flex items-center mb-6">
+        ← Back to Hotels
+    </a>
+
+    <div class="bg-white rounded-3xl shadow-xl overflow-hidden mb-10 border border-gray-100">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
+            <div class="h-[400px] lg:h-full min-h-[350px] bg-gray-200">
+    {% if hotel.image %}
+        <img src="{{ hotel.image.url }}" alt="{{ hotel.name }}" class="w-full h-full object-cover">
+    {% else %}
+        <div class="w-full h-full flex items-center justify-center text-gray-500">No Image Available</div>
+    {% endif %}
+</div>
+
+            <div class="p-8 lg:p-12 flex flex-col justify-between bg-gradient-to-br from-white to-gray-50">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <span class="bg-red-100 text-primary text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Premium Stay</span>
+                        <span class="text-yellow-500 text-sm font-bold">★ {{ hotel.star_rating }}.0 Rating</span>
+                    </div>
+                    <h1 class="text-3xl lg:text-4xl font-extrabold text-gray-900 tracking-tight mb-2">{{ hotel.name }}</h1>
+                    <p class="text-gray-600 flex items-center mb-6">
+                        <svg class="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                        {{ hotel.location }}
+                    </p>
+                    <hr class="border-gray-200 mb-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">About the Hotel</h3>
+                    <p class="text-gray-600 leading-relaxed mb-6">{{ hotel.description }}</p>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3">Amenities Provided</h3>
+                    <div class="flex flex-wrap gap-2">
+                        {% for amenity in hotel.amenities.all %}
+                            <span class="bg-white border border-gray-200 text-gray-700 text-sm px-4 py-1.5 rounded-full shadow-sm flex items-center">
+                                {{ amenity.name }}
+                            </span>
+                        {% empty %}
+                            <span class="text-gray-400 text-sm">Standard Amenities Included.</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-16">
+        <div class="flex flex-col items-center mb-10 text-center">
+            <h2 class="text-3xl font-black text-gray-900 tracking-tight">Select Your Room Category</h2>
+            <div class="w-16 h-1 bg-red-500 mt-3 rounded-full"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for cat in hotel.categories.all %}
+                <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col group">
+                    
+                    <div class="h-52 overflow-hidden relative bg-gray-100">
+                        {% if cat.image %}
+                            <img src="{{ cat.image.url }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="{{ cat.type_name }}">
+                        {% else %}
+                            <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Room Default">
+                        {% endif %}
+                        
+                        <div class="absolute top-4 right-4 bg-gray-900/80 backdrop-blur-md px-3 py-1.5 rounded-xl text-xs font-bold text-white shadow-sm flex items-center space-x-1">
+                            <span>Max Guests: {{ cat.capacity }}</span>
+                        </div>
+                    </div>
+
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-red-500 transition duration-300">
+                                {{ cat.type_name }}
+                            </h3>
+                            <p class="text-gray-500 text-sm leading-relaxed mb-6">
+                                Experience ultimate luxury with premium amenities, high-speed Wi-Fi, and 24/7 dedicated room service tailored for a perfect stay.
+                            </p>
+                        </div>
+                        
+                        <div class="pt-4 border-t border-gray-50 flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">Price per night</p>
+                                <div class="flex items-baseline space-x-1">
+                                    <span class="text-2xl font-black text-gray-900">₹{{ cat.price_per_night }}</span>
+                                    <span class="text-gray-400 text-xs font-medium">/night</span>
+                                </div>
+                            </div>
+                            <a href="{% url 'book_room' cat.id %}" class="bg-red-500 text-white text-sm font-bold px-5 py-3 rounded-xl hover:bg-red-600 transition-all duration-300 shadow-md hover:shadow-red-500/20 transform active:scale-95">
+                                Book Now
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            {% empty %}
+                <div class="col-span-full text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                    <p class="text-gray-400 font-medium text-sm">No active room categories registered under this hotel yet.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+   
+
+</div>
+{% endblock %}

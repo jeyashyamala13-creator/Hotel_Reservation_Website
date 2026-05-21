@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - StayEase | Book Premium Hotels{% endblock %}
+
+{% block content %}
+<section class="relative bg-gray-900 h-[600px] flex items-center justify-center">
+    <div class="absolute inset-0 overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aG90ZWwlMjBib29raW5nfGVufDB8fDB8fHww">
+    </div>
+    
+    <div class="relative z-10 w-full max-w-5xl mx-auto px-4 mt-16 text-center">
+        <h1 class="text-4xl md:text-6xl font-black text-white mb-6 drop-shadow-lg">Find Your Perfect Stay.</h1>
+        <p class="text-lg md:text-xl text-white/90 mb-10 font-medium">Discover premium hotels and resorts at the best prices.</p>
+
+        <div class="bg-white p-4 md:p-6 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-4 items-end text-left">
+            <div class="w-full md:w-1/3">
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Location</label>
+                <input type="text" placeholder="Where do you want to go?" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none">
+            </div>
+            <div class="w-full md:w-1/4">
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Check-In</label>
+                <input type="date" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none">
+            </div>
+            <div class="w-full md:w-1/4">
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Check-Out</label>
+                <input type="date" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none">
+            </div>
+            <div class="w-full md:w-auto flex-grow">
+                <button class="w-full bg-red-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-red-700 transition shadow-lg h-[50px]">
+                    Search
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="max-w-7xl mx-auto px-4 py-16">
+    <div class="flex justify-between items-end mb-8">
+        <div>
+            <h2 class="text-3xl font-extrabold text-gray-900">Popular Hotels</h2>
+            <p class="text-gray-500 mt-2">Most booked properties by our guests this month.</p>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {% for hotel in hotels|slice:":3" %}
+        <div class="bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden border border-gray-100 group">
+            <div class="h-48 overflow-hidden relative">
+                {% if hotel.image %}
+                    <img src="{{ hotel.image.url }}" alt="{{ hotel.name }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                {% else %}
+                    <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500&q=80" alt="Hotel Placeholder" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                {% endif %}
+                <div class="absolute top-4 right-4 bg-white/90 px-2 py-1 rounded-lg text-xs font-bold text-gray-900 shadow">⭐ {{ hotel.star_rating }}</div>
+            </div>
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-900">{{ hotel.name }}</h3>
+                <p class="text-gray-500 text-sm mt-1 mb-4 flex items-center">
+                    📍 {{ hotel.location }}
+                </p>
+                
+                <div class="flex justify-between items-center mb-4 text-sm">
+                    <span class="font-bold text-red-600">Starting ₹{{ hotel.starting_price }}</span>
+                    <span class="text-xs bg-green-50 text-green-700 px-2 py-1 rounded font-bold">{{ hotel.available_rooms_count }} Rooms Left</span>
+                </div>
+                
+                <a href="{% url 'hotel_detail' hotel.id %}" class="block w-full text-center bg-gray-900 text-white font-bold py-2 rounded-xl hover:bg-gray-800 transition">View Details</a>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-gray-500 col-span-3 text-center py-8">No hotels found. Add them through the Admin Panel.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="bg-gray-50 py-16">
+    <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl font-extrabold text-gray-900 text-center mb-10">Handpicked Featured Rooms</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {% for cat in room_categories %}
+            <div class="bg-white rounded-2xl shadow-sm hover:shadow-md border border-gray-100 p-4 flex flex-col justify-between">
+                <div>
+                    <div class="h-40 overflow-hidden rounded-xl mb-4">
+                        {% if cat.image %}
+                            <img src="{{ cat.image.url }}" class="w-full h-full object-cover" alt="{{ cat.type_name }}">
+                        {% else %}
+                            <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=500&q=80" class="w-full h-full object-cover" alt="Room Placeholder">
+                        {% endif %}
+                    </div>
+                    <span class="text-xs font-black text-red-600 uppercase tracking-widest bg-red-50 px-2 py-0.5 rounded">Active Suite</span>
+                    <h3 class="text-lg font-bold text-gray-900 mt-1">{{ cat.type_name }}</h3>
+                    <p class="text-xs text-gray-400 mt-1">Belongs to: <span class="font-semibold text-gray-600">{{ cat.hotel.name }}</span></p>
+                </div>
+                
+                <div class="mt-6 flex justify-between items-center border-t border-gray-50 pt-4">
+                    <div>
+                        <p class="text-[10px] text-gray-400 uppercase font-bold">Price per night</p>
+                        <p class="text-lg font-black text-gray-900">₹{{ cat.price_per_night }}</p>
+                    </div>
+                    <a href= "{% url 'book_room' cat.id %}" class="bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-red-700 transition">
+                        Book Now
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-gray-500 col-span-4 text-center">No active room categories available. Ensure rooms/categories are registered and passed from views.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="max-w-7xl mx-auto px-4 py-16">
+    <div class="bg-red-600 rounded-3xl p-10 flex flex-col md:flex-row items-center justify-between text-white shadow-xl relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-red-500 rounded-full blur-3xl opacity-50 -mr-20 -mt-20"></div>
+        <div class="relative z-10 md:w-2/3">
+            <span class="bg-white/20 px-3 py-1 text-xs font-bold uppercase rounded-full tracking-wider">Limited Time</span>
+            <h2 class="text-3xl font-extrabold mt-4 mb-2">Get 20% off on your first booking!</h2>
+            <p class="text-white/80">Use code <span class="font-mono bg-white/20 px-2 py-0.5 rounded">NEWSTAY20</span> at checkout. Valid till end of this month.</p>
+        </div>
+        <div class="relative z-10 mt-6 md:mt-0">
+            <button class="bg-white text-red-600 font-bold px-8 py-3 rounded-xl shadow-lg hover:bg-gray-50 transition">Copy Code</button>
+        </div>
+    </div>
+</section>
+
+<section class="py-16">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-extrabold text-gray-900 mb-12">Why Choose StayEase?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div class="flex flex-col items-center">
+                <div class="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Secure Booking</h3>
+                <p class="text-gray-500 text-sm px-4">Your payment and personal data are protected by industry-leading encryption.</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Instant Confirmation</h3>
+                <p class="text-gray-500 text-sm px-4">No waiting time. Get your booking confirmed instantly straight to your dashboard.</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">24/7 Support</h3>
+                <p class="text-gray-500 text-sm px-4">Our dedicated customer support team is available round the clock to help you.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bg-gray-50 py-16">
+    <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl font-extrabold text-gray-900 text-center mb-12">What Our Guests Say</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                <p class="text-gray-600 italic text-sm mb-6">"Absolutely wonderful experience. The booking process was incredibly smooth and the hotel exceeded our expectations!"</p>
+                <div class="flex items-center">
+                    <div class="w-9 h-9 bg-red-100 rounded-full flex items-center justify-center font-bold text-red-600 text-sm">JD</div>
+                    <div class="ml-3">
+                        <p class="text-xs font-bold text-gray-900">John Doe</p>
+                        <p class="text-[10px] text-gray-400">Regular Traveler</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                <p class="text-gray-600 italic text-sm mb-6">"I am amazed by how easy it was to handle cancellations through the dynamic dashboard. Customer service was excellent too!"</p>
+                <div class="flex items-center">
+                    <div class="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600 text-sm">AR</div>
+                    <div class="ml-3">
+                        <p class="text-xs font-bold text-gray-900">Ananya Ram</p>
+                        <p class="text-[10px] text-gray-400">Family Vacationer</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                <p class="text-gray-600 italic text-sm mb-6">"Clean layout, no tricky hidden fees during validation checks, and instant approval. Best premium hotel aggregation platform."</p>
+                <div class="flex items-center">
+                    <div class="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center font-bold text-green-600 text-sm">SK</div>
+                    <div class="ml-3">
+                        <p class="text-xs font-bold text-gray-900">Suresh Kumar</p>
+                        <p class="text-[10px] text-gray-400">Business Client</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                <p class="text-gray-600 italic text-sm mb-6">"Highly recommended platform. Found a premium deluxe category room at an amazing discount. Will use it for all future stays."</p>
+                <div class="flex items-center">
+                    <div class="w-9 h-9 bg-purple-100 rounded-full flex items-center justify-center font-bold text-purple-600 text-sm">PP</div>
+                    <div class="ml-3">
+                        <p class="text-xs font-bold text-gray-900">Pooja Patel</p>
+                        <p class="text-[10px] text-gray-400">Solo Backpacker</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="max-w-4xl mx-auto px-4 py-16">
+    <h2 class="text-3xl font-extrabold text-gray-900 text-center mb-10">Frequently Asked Questions</h2>
+    <div class="space-y-4">
+        <details class="group bg-white border border-gray-200 rounded-xl p-6 open:shadow-md transition-all">
+            <summary class="font-bold text-gray-900 cursor-pointer flex justify-between items-center outline-none">
+                How do I cancel my booking?
+                <span class="text-gray-400 group-open:rotate-180 transition-transform text-xs">▼</span>
+            </summary>
+            <p class="text-gray-600 text-sm mt-4 leading-relaxed">You can easily cancel your booking by going to "My Dashboard" after logging in. Click the "Cancel Stay" button next to your active booking.</p>
+        </details>
+        <details class="group bg-white border border-gray-200 rounded-xl p-6 open:shadow-md transition-all">
+            <summary class="font-bold text-gray-900 cursor-pointer flex justify-between items-center outline-none">
+                Are there any hidden charges?
+                <span class="text-gray-400 group-open:rotate-180 transition-transform text-xs">▼</span>
+            </summary>
+            <p class="text-gray-600 text-sm mt-4 leading-relaxed">No, the price you see on the checkout page is the final price. We believe in 100% pricing transparency.</p>
+        </details>
+        <details class="group bg-white border border-gray-200 rounded-xl p-6 open:shadow-md transition-all">
+            <summary class="font-bold text-gray-900 cursor-pointer flex justify-between items-center outline-none">
+                What are the standard Check-In and Check-Out timings?
+                <span class="text-gray-400 group-open:rotate-180 transition-transform text-xs">▼</span>
+            </summary>
+            <p class="text-gray-600 text-sm mt-4 leading-relaxed"> Generally, standard hotel check-in starts from 12:00 PM onwards, and check-out must be completed before 11:00 AM on the day of your departure.</p>
+        </details>
+        <details class="group bg-white border border-gray-200 rounded-xl p-6 open:shadow-md transition-all">
+            <summary class="font-bold text-gray-900 cursor-pointer flex justify-between items-center outline-none">
+                Is it mandatory to create an account to reserve rooms?
+                <span class="text-gray-400 group-open:rotate-180 transition-transform text-xs">▼</span>
+            </summary>
+            <p class="text-gray-600 text-sm mt-4 leading-relaxed">Yes, creating a secured account helps protect your transaction history and allows you to access the Cancellation engine at any given time via your profile dashboard.</p>
+        </details>
+        <details class="group bg-white border border-gray-200 rounded-xl p-6 open:shadow-md transition-all">
+            <summary class="font-bold text-gray-900 cursor-pointer flex justify-between items-center outline-none">
+                How long does a refund take after a successful cancellation?
+                <span class="text-gray-400 group-open:rotate-180 transition-transform text-xs">▼</span>
+            </summary>
+            <p class="text-gray-600 text-sm mt-4 leading-relaxed">Once you hit cancel on your dashboard, processing happens instantly. The bank settlement will credit back your original source payment route within 5 to 7 working business days.</p>
+        </details>
+    </div>
+</section>
+
+<section class="bg-gray-900 text-white py-20 text-center">
+    <div class="max-w-3xl mx-auto px-4">
+        <h2 class="text-4xl font-black mb-6">Ready for your next adventure?</h2>
+        <p class="text-gray-400 mb-8">Join thousands of happy travelers and book your dream stay today.</p>
+        {% if not user.is_authenticated %}
+            <a href="{% url 'register' %}" class="inline-block bg-red-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-red-700 transition shadow-lg shadow-red-600/30">Create Free Account</a>
+        {% else %}
+            <a href="{% url 'hotel_list' %}" class="inline-block bg-red-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-red-700 transition shadow-lg shadow-red-600/30">Browse Hotels Now</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

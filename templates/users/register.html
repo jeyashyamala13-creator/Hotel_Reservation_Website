@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Register - StayEase{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto px-4 py-16">
+    <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
+        <h2 class="text-2xl font-extrabold text-gray-900 mb-6 text-center">Create an Account</h2>
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="w-full bg-primary text-white font-bold py-3 rounded-xl hover:bg-red-600 transition">Register</button>
+        </form>
+        <p class="text-center text-sm text-gray-500 mt-6">Already have an account? <a href="{% url 'login' %}" class="text-primary hover:underline font-bold">Log in</a></p>
+    </div>
+</div>
+{% endblock %}

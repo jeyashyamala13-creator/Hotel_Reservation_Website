@@ -1,0 +1,56 @@
+{% extends 'admin/dashboard_base.html' %}
+
+{% block admin_title %}Categories & Dynamic Pricing Matrix{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden animate-fade-in">
+    <div class="p-6 border-b border-gray-100">
+        <h3 class="text-lg font-black text-gray-900">Dynamic Pricing Rules Matrix</h3>
+        <p class="text-xs text-gray-400 font-semibold">Modify baseline price rates below to directly update live web user portal rates instantaneously</p>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-50 border-b border-gray-100">
+                    <th class="p-4 text-xs font-bold uppercase text-gray-400 tracking-wider">Property Parent Asset</th>
+                    <th class="p-4 text-xs font-bold uppercase text-gray-400 tracking-wider">Category Classification</th>
+                    <th class="p-4 text-xs font-bold uppercase text-gray-400 tracking-wider">Design Capacity</th>
+                    <th class="p-4 text-xs font-bold uppercase text-gray-400 tracking-wider">Current Nightly Fee Index</th>
+                    <th class="p-4 text-xs font-bold uppercase text-gray-400 tracking-wider text-right">Dynamic Action Interface</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50 text-sm font-semibold text-gray-700">
+                {% for category in categories %}
+                <tr class="hover:bg-gray-50/60 transition">
+                    <td class="p-4 font-black text-gray-900">{{ category.hotel.name }}</td>
+                    <td class="p-4 text-gray-600 text-xs">{{ category.type_name }}</td>
+                    <td class="p-4 text-gray-500">{{ category.capacity }} Guest Allocation Tiers</td>
+                    <td class="p-4 text-gray-900 font-black">₹{{ category.price_per_night }}</td>
+                    <td class="p-4 text-right">
+                        <form method="POST" action="{% url 'admin_manage_categories' %}" class="flex items-center justify-end gap-2">
+                            {% csrf_token %}
+                            <input type="hidden" name="category_id" value="{{ category.id }}">
+                            <div class="relative rounded-xl shadow-sm max-w-[120px]">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-400 text-xs font-bold">₹</span>
+                                </div>
+                                <input type="number" name="price" required min="1" step="0.01" value="{{ category.price_per_night }}" 
+                                       class="block w-full pl-7 pr-3 py-1.5 text-xs font-bold rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50/50">
+                            </div>
+                            <button type="submit" class="bg-gray-900 hover:bg-gray-800 text-white text-xs font-black px-3 py-2 rounded-xl transition shadow-sm">
+                                Apply Rate
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-12 text-sm text-gray-400 font-medium">No real category asset objects indexed under database records system yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

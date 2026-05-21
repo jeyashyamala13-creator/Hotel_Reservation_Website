@@ -1,0 +1,67 @@
+{% extends 'admin/dashboard_base.html' %}
+
+{% block admin_title %}Revenue Reports & Strategic Ledger{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-8 animate-fade-in">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between group hover:shadow-md transition duration-300">
+            <div>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Cumulative Price Index Valuation</p>
+                <h3 class="text-4xl font-black text-gray-900">₹{{ total_value }}</h3>
+                <p class="text-xs text-gray-500 font-medium mt-1">Aggregated calculation metric of room types base rates</p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-xl">💸</div>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between group hover:shadow-md transition duration-300">
+            <div>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Peak Ceiling Tier Cost Rate</p>
+                <h3 class="text-4xl font-black text-red-600">₹{{ max_priced }}</h3>
+                <p class="text-xs text-gray-500 font-medium mt-1">Highest recorded nightly fee set across categories</p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-gray-900 text-white flex items-center justify-center font-bold text-xl">📈</div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h3 class="text-lg font-black text-gray-900">Live Corporate Assets Appraisal Registry</h3>
+                <p class="text-xs text-gray-400 font-semibold">Audit statement lists matching active operational records cleanly</p>
+            </div>
+            
+            <a href="{% url 'export_revenue_pdf' %}" class="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-xs font-black px-4 py-2.5 rounded-xl transition shadow-lg shadow-red-600/20 w-full sm:w-auto justify-center">
+                <span>📥</span> Download Verified PDF Report
+            </a>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-100">
+                        <th class="p-4 text-xs font-bold uppercase text-gray-400 tracking-wider">Hotel Asset Name</th>
+                        <th class="p-4 text-xs font-bold uppercase text-gray-400 tracking-wider">Category Classification</th>
+                        <th class="p-4 text-xs font-bold uppercase text-gray-400 tracking-wider">Capacity Threshold</th>
+                        <th class="p-4 text-xs font-bold uppercase text-gray-400 tracking-wider text-right">Standard Nightly Rate</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50 text-sm font-semibold text-gray-700">
+                    {% for cat in categories %}
+                    <tr class="hover:bg-gray-50/60 transition">
+                        <td class="p-4 font-black text-gray-900">{{ cat.hotel.name }}</td>
+                        <td class="p-4 text-gray-600">{{ cat.type_name }}</td>
+                        <td class="p-4 text-gray-500 text-xs">{{ cat.capacity }} Guests Max Limit</td>
+                        <td class="p-4 text-right text-gray-900 font-black">₹{{ cat.price_per_night }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-12 text-sm text-gray-400 font-medium">No system metrics logs populated under application registry.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

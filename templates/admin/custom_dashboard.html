@@ -1,0 +1,158 @@
+{% extends 'admin/dashboard_base.html' %}
+
+{% block admin_title %}Dashboard Overview{% endblock %}
+
+{% block admin_content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="space-y-8 animate-fade-in">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md transition duration-300">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-red-50 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-red-100 transition"></div>
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Total Hotels</p>
+            <h3 class="text-3xl font-black text-gray-900">{{ total_hotels }}</h3>
+            <p class="text-xs text-gray-500 font-medium mt-2">Active properties managed</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md transition duration-300">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-green-50 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-green-100 transition"></div>
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Available Rooms</p>
+            <h3 class="text-3xl font-black text-green-600">{{ available_rooms }}<span class="text-sm text-gray-400 font-bold"> / {{ total_rooms }} Total</span></h3>
+            <p class="text-xs text-gray-500 font-medium mt-2">Ready for instant check-in</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md transition duration-300">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-blue-100 transition"></div>
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Booked Rooms</p>
+            <h3 class="text-3xl font-black text-blue-600">{{ booked_rooms }}</h3>
+            <p class="text-xs text-gray-500 font-medium mt-2">Currently occupied inventory</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md transition duration-300">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-purple-50 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-purple-100 transition"></div>
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Lowest Floor Price</p>
+            <h3 class="text-3xl font-black text-gray-900">₹{{ avg_price }}</h3>
+            <p class="text-xs text-gray-500 font-medium mt-2">Minimum configuration tier</p>
+        </div>
+    </div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <p class="text-sm text-gray-500">Total Bookings</p>
+        <h3 class="text-3xl font-black">{{ total_bookings }}</h3>
+    </div>
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <p class="text-sm text-gray-500">Pending Requests</p>
+        <h3 class="text-3xl font-black text-orange-600">{{ pending_bookings }}</h3>
+    </div>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+    <h3 class="text-lg font-black mb-4">Recent Bookings</h3>
+    <table class="w-full text-left">
+        <thead>
+            <tr class="text-gray-400 text-xs uppercase">
+                <th class="pb-3">User</th>
+                <th class="pb-3">Room</th>
+                <th class="pb-3">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in recent_bookings %}
+            <tr class="border-t border-gray-100">
+                <td class="py-3 font-bold">{{ booking.user.username }}</td>
+                <td class="py-3">{{ booking.room.room_number }}</td>
+                <td class="py-3 text-sm font-bold text-blue-600">{{ booking.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col justify-between">
+            <div class="mb-4">
+                <h3 class="text-lg font-black text-gray-900">Category Price Analytics</h3>
+                <p class="text-xs text-gray-400 font-semibold">Live cost breakdown per night dynamically synced from DB</p>
+            </div>
+            <div class="relative h-72 w-full">
+                <canvas id="categoryDashboardChart"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col justify-between">
+            <div class="mb-4">
+                <h3 class="text-lg font-black text-gray-900">Inventory Split</h3>
+                <p class="text-xs text-gray-400 font-semibold">Real-time room availability distribution status</p>
+            </div>
+            <div class="relative h-60 w-full flex items-center justify-center">
+                <canvas id="roomDistributionChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // 1. Bar Chart Setup for Categories Prices
+        const catCtx = document.getElementById('categoryDashboardChart').getContext('2d');
+        new Chart(catCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ chart_labels|safe }},
+                datasets: [{
+                    label: 'Price per Night (₹)',
+                    data: {{ revenue_data|safe }},
+                    backgroundColor: 'rgba(239, 68, 68, 0.9)',
+                    borderRadius: 12,
+                    barThickness: 26,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { borderDash: [4, 4], color: '#f3f4f6', drawBorder: false },
+                        ticks: { font: { weight: '600', size: 11 }, color: '#9ca3af' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { weight: '600', size: 11 }, color: '#9ca3af' }
+                    }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // 2. Doughnut Chart Setup for Available vs Booked
+        const roomCtx = document.getElementById('roomDistributionChart').getContext('2d');
+        new Chart(roomCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Available Inventory', 'Booked Out'],
+                datasets: [{
+                    data: [{{ available_rooms }}, {{ booked_rooms }}],
+                    backgroundColor: ['#ef4444', '#1f2937'],
+                    borderWidth: 0,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '76%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { usePointStyle: true, pointStyle: 'circle', boxWidth: 8, font: { weight: '700', size: 11 }, color: '#4b5563' }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
