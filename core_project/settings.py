@@ -20,7 +20,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-dv==9+#nr8*p%-_n+rt*fcsu)9qpkg8l_(o5(&hz+67e^sd#!b'
+import os
+
+# SECRET_KEY-ai hardcode pannama, Environment variable-la irunthu eduthukkum
+# Render-la illa na 'dev-secret-key' use pannum
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-default-key-for-local')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -128,4 +132,7 @@ import os
 # System-la images store aagura path
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
